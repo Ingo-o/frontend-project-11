@@ -1,5 +1,5 @@
-const fuc = () => {
+const func = () => {
   const hello = 'Hello World!';
-  const buy = 'Goodbuy mate!';
+  const helloween = 'I want out';
   console.log(hello);
 };
