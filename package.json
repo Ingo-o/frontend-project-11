@@ -26,5 +26,10 @@
     "prettier": "2.7.1",
     "webpack": "^5.74.0",
     "webpack-cli": "^4.10.0"
+  },
+  "dependencies": {
+    "bootstrap": "^5.2.2",
+    "jquery": "^3.6.1",
+    "popper.js": "^1.16.1"
   }
 }
