@@ -1,5 +1,5 @@
 function greet() {
-  console.log('Hello folks!');
+  alert('Hello folks!');
 }
 
 export default greet;
