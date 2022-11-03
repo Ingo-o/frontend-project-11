@@ -19,3 +19,8 @@ const watchedState = onChange(formState, (path, value) => {
 form.addEventListener('change', (e) => {
   watchedState.data = e.target.value;
 });
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  alert(formState.data);
+});
