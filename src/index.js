@@ -1,7 +1,4 @@
 import 'bootstrap';
 
-function greet() {
-  alert('Alert!');
-}
-
-greet();
+const form = document.getElementById('form');
+form.style.background = 'red';
