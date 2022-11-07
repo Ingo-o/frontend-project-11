@@ -1,7 +1,7 @@
 import onChange from 'on-change';
 import state from './state';
 
-const inputField = document.getElementById('inputField');
+const inputField = document.getElementById('url-input');
 
 const watchedState = onChange(state, (path, value) => {
   if (value === true) {
