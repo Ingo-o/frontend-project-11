@@ -1,7 +1,16 @@
-// import 'bootstrap';
 import * as yup from 'yup';
+import i18next from 'i18next';
+import ru from './ru';
 import state from './state';
 import watchedState from './watchedState';
+
+i18next.init({
+  lng: 'ru',
+  debug: true,
+  resources: {
+    ru,
+  },
+});
 
 const form = document.getElementById('form');
 
@@ -11,7 +20,11 @@ form.addEventListener('change', (e) => {
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const schema = yup.string().required().url().notOneOf(state.feeds);
+  const schema = yup
+    .string()
+    .required(i18next.t('verificationErrors.required'))
+    .url(i18next.t('verificationErrors.url'))
+    .notOneOf(state.feeds, i18next.t('verificationErrors.notOneOf'));
 
   schema
     .validate(state.inputData)
