@@ -1,5 +1,6 @@
 import * as yup from 'yup';
 import i18next from 'i18next';
+import axios from 'axios';
 import ru from './ru';
 import state from './state';
 import watchedState from './watchedState';
@@ -30,8 +31,18 @@ form.addEventListener('submit', (e) => {
     .validate(state.inputData)
     .then(() => {
       watchedState.isValid = true;
-      state.feeds.push(state.inputData);
     })
+    .then(() => {
+      axios
+        .get(
+          // eslint-disable-next-line comma-dangle
+          `https://allorigins.hexlet.app/get?disableCache=true&url=${e.target.value}`
+        )
+        .then((response) => {
+          console.log(response);
+        });
+    })
+    .then(() => state.feeds.push(state.inputData))
     .catch((error) => {
       // eslint-disable-next-line no-console
       console.log(error);
