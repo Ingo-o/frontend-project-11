@@ -3,6 +3,7 @@ import i18next from 'i18next';
 import axios from 'axios';
 import ru from './ru';
 import state from './state';
+import parser from './parser';
 import watchedState from './watchedState';
 
 i18next.init({
@@ -25,7 +26,7 @@ form.addEventListener('submit', (e) => {
     .string()
     .required(i18next.t('verificationErrors.required'))
     .url(i18next.t('verificationErrors.url'))
-    .notOneOf(state.feeds, i18next.t('verificationErrors.notOneOf'));
+    .notOneOf(state.feedsLinks, i18next.t('verificationErrors.notOneOf'));
 
   schema
     .validate(state.inputData)
@@ -34,18 +35,19 @@ form.addEventListener('submit', (e) => {
     })
     .then(() => {
       axios
-        .get(
-          // eslint-disable-next-line comma-dangle
-          `https://allorigins.hexlet.app/get?disableCache=true&url=${e.target.value}`
-        )
-        .then((response) => {
-          console.log(response);
+        .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${state.inputData}`)
+        .then((response) => parser(response))
+        .then((parsingResult) => {
+          state.feeds.push(parsingResult.feed);
+          parsingResult.items.forEach((item) => state.items.push(item));
         });
     })
-    .then(() => state.feeds.push(state.inputData))
+    .then(() => state.feedsLinks.push(state.inputData))
     .catch((error) => {
-      // eslint-disable-next-line no-console
       console.log(error);
       watchedState.isValid = false;
     });
+
+  console.log(state.feeds);
+  console.log(state.items);
 });

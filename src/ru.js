@@ -1,4 +1,4 @@
-const ru = {
+export default {
   translation: {
     verificationErrors: {
       required: 'Поле не должно быть пустым',
@@ -8,5 +8,3 @@ const ru = {
     submitBtn: 'Отправить',
   },
 };
-
-export default ru;
