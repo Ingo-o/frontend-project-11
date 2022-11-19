@@ -22,32 +22,33 @@ form.addEventListener('change', (e) => {
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
+
   const schema = yup
     .string()
-    .required(i18next.t('verificationErrors.required'))
-    .url(i18next.t('verificationErrors.url'))
-    .notOneOf(state.feedsLinks, i18next.t('verificationErrors.notOneOf'));
+    .required(i18next.t('validationErrors.required'))
+    .url(i18next.t('validationErrors.url'))
+    .notOneOf(state.feedsLinks, i18next.t('validationErrors.notOneOf'));
 
   schema
     .validate(state.inputData)
     .then(() => {
       watchedState.isValid = true;
     })
+    .then(state.feedsLinks.push(state.inputData))
     .then(() => {
       axios
         .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${state.inputData}`)
         .then((response) => parser(response))
         .then((parsingResult) => {
-          state.feeds.push(parsingResult.feed);
-          parsingResult.items.forEach((item) => state.items.push(item));
-        });
+          watchedState.feeds.push(parsingResult.feed);
+          watchedState.items = state.items.concat(parsingResult.items);
+        }); // http://ports.com/feed/
     })
-    .then(() => state.feedsLinks.push(state.inputData))
     .catch((error) => {
-      console.log(error);
+      alert(error);
       watchedState.isValid = false;
     });
 
-  console.log(state.feeds);
-  console.log(state.items);
+  /* console.log(state.feeds);
+  console.log(state.items); */
 });

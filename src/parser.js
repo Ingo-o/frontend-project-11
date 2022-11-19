@@ -15,7 +15,7 @@ export default (response) => {
   const items = Array.from(data.querySelectorAll('item')).map((item) => {
     state.itemsCount += 1;
     return {
-      feedID: feed.feedID,
+      feedID: state.feedsCount,
       itemID: state.itemsCount,
       title: item.querySelector('title').textContent,
       description: item.querySelector('description').textContent,

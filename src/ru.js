@@ -1,6 +1,6 @@
 export default {
   translation: {
-    verificationErrors: {
+    validationErrors: {
       required: 'Поле не должно быть пустым',
       url: 'Это должен быть действительный URL',
       notOneOf: 'Такой URL уже есть в базе',
