@@ -42,13 +42,23 @@ form.addEventListener('submit', (e) => {
         .then((parsingResult) => {
           watchedState.feeds.push(parsingResult.feed);
           watchedState.items = state.items.concat(parsingResult.items);
-        }); // http://ports.com/feed/
+        })
+        .catch((error) => {
+          // eslint-disable-next-line no-alert
+          alert(error.message);
+          // eslint-disable-next-line no-console
+          console.log(error);
+        });
     })
     .catch((error) => {
+      // eslint-disable-next-line no-alert
       alert(error);
       watchedState.isValid = false;
     });
 
-  /* console.log(state.feeds);
-  console.log(state.items); */
+  // console.log(state.feeds);
+  // console.log(state.items);
 });
+
+// error:
+// http://ports.com/feed/
