@@ -1,5 +1,6 @@
 export default {
   isValid: null,
+  isRecheckRunning: false,
   inputData: null,
   feedsLinks: [],
   feedsCount: 0,

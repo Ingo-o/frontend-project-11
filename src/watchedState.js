@@ -14,7 +14,7 @@ export default onChange(state, (path, value) => {
     }
   }
   if (path === 'feeds') {
-    const justAddedFeed = state.feeds.filter((feed) => feed.feedID === state.feedsLinks.length);
+    const justAddedFeed = state.feeds.filter((feed) => feed.feedID === state.feeds.length);
 
     const title = document.createElement('h1');
     title.classList.add('title');
@@ -28,7 +28,7 @@ export default onChange(state, (path, value) => {
     feedsDisplay.prepend(title);
   }
   if (path === 'items') {
-    const justAddedItems = state.items.filter((item) => item.feedID === state.feedsLinks.length);
+    const justAddedItems = state.items.filter((item) => item.feedID === state.feeds.length);
 
     justAddedItems.forEach((item) => {
       const li = document.createElement('li');
