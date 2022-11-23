@@ -3,7 +3,7 @@ import i18next from 'i18next';
 import axios from 'axios';
 import ru from './ru';
 import state from './state';
-import parser from './parser';
+import { feedParser, itemsParser } from './parsers';
 import watchedState from './watchedState';
 
 i18next.init({
@@ -15,40 +15,28 @@ i18next.init({
 });
 
 const form = document.getElementById('form');
-const feedsDisplay = document.getElementById('feed');
-const itemsDisplay = document.getElementById('items');
 
-const reCheck = () => {
-  // eslint-disable-next-line no-console
-  console.log('reCheck!');
-  state.feedsCount = 0;
-  state.itemsCount = 0;
-  state.feeds = [];
-  state.items = [];
-  feedsDisplay.textContent = '';
-  itemsDisplay.textContent = '';
+const itemsRecheck = () => {
+  /* console.log('itemsRecheck!'); */
   state.feedsLinks.forEach((feedLink) => {
     axios
       .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${feedLink}`)
-      .then((response) => parser(response))
+      .then((response) => itemsParser(response))
       .then((parsingResult) => {
-        watchedState.feeds.push(parsingResult.feed);
-        watchedState.items = state.items.concat(parsingResult.items);
+        watchedState.items = state.items.concat(parsingResult);
       })
       .catch((error) => {
-        // eslint-disable-next-line no-console
-        console.log(error);
+        throw error;
       });
   });
-  setTimeout(reCheck, 5000);
+  setTimeout(itemsRecheck, 5000);
 };
 
-const firstReCheck = () => {
-  if (state.isRecheckRunning === false) {
-    // eslint-disable-next-line no-console
-    console.log('firstReCheck!');
-    state.isRecheckRunning = true;
-    reCheck();
+const firstItemsRecheck = () => {
+  if (state.isRecheckStarted === false) {
+    /* console.log('firstItemsRecheck!'); */
+    state.isRecheckStarted = true;
+    itemsRecheck();
   }
 };
 
@@ -73,29 +61,25 @@ form.addEventListener('submit', (e) => {
     .then(() => {
       axios
         .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${state.inputData}`)
-        .then((response) => parser(response))
+        .then((response) => feedParser(response))
         .then((parsingResult) => {
           watchedState.feeds.push(parsingResult.feed);
           watchedState.items = state.items.concat(parsingResult.items);
+          /* console.log(state.feeds); */
+          /* console.log(state.items); */
         })
         .then(() => {
           state.feedsLinks.push(state.inputData);
         })
+        .then(() => setTimeout(firstItemsRecheck, 5000))
         .catch((error) => {
-          // eslint-disable-next-line no-console
-          console.log(error);
+          throw error;
         });
     })
-    .then(() => setTimeout(firstReCheck, 5000))
     .catch((error) => {
-      // eslint-disable-next-line no-console
-      console.log(error);
       watchedState.isValid = false;
+      throw error;
     });
-
-  // console.log(state.feeds);
-  // console.log(state.items);
 });
 
-// error:
-// https://worldoftanks.ru/ru/rss/news/
+// Писюкатая ссылка: https://worldoftanks.ru/ru/rss/news/

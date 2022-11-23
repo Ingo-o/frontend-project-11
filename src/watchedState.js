@@ -14,23 +14,23 @@ export default onChange(state, (path, value) => {
     }
   }
   if (path === 'feeds') {
-    const justAddedFeed = state.feeds.filter((feed) => feed.feedID === state.feeds.length);
+    const lastAddedFeed = state.feeds[state.feeds.length - 1];
 
     const title = document.createElement('h1');
     title.classList.add('title');
-    title.innerHTML = justAddedFeed[0].title;
+    title.innerHTML = lastAddedFeed.title;
 
     const description = document.createElement('div');
     description.classList.add('description');
-    description.innerHTML = justAddedFeed[0].description;
+    description.innerHTML = lastAddedFeed.description;
 
     feedsDisplay.prepend(description);
     feedsDisplay.prepend(title);
   }
   if (path === 'items') {
-    const justAddedItems = state.items.filter((item) => item.feedID === state.feeds.length);
+    itemsDisplay.innerText = '';
 
-    justAddedItems.forEach((item) => {
+    state.items.forEach((item) => {
       const li = document.createElement('li');
       const link = document.createElement('a');
       link.classList.add('link');
