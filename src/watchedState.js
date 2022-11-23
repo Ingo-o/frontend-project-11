@@ -1,4 +1,5 @@
 import onChange from 'on-change';
+import i18next from 'i18next';
 import state from './state';
 
 const inputField = document.getElementById('url-input');
@@ -33,11 +34,17 @@ export default onChange(state, (path, value) => {
     state.items.forEach((item) => {
       const li = document.createElement('li');
       const link = document.createElement('a');
-      link.classList.add('link');
+      link.classList.add('link', 'fw-bold');
       link.innerHTML = item.title;
       link.setAttribute('href', item.link);
-      li.prepend(link);
-      itemsDisplay.prepend(li);
+      li.append(link);
+
+      const button = document.createElement('button');
+      button.classList.add('button');
+      button.innerHTML = i18next.t('viewBtn');
+      li.append(button);
+
+      itemsDisplay.append(li);
     });
   }
 });

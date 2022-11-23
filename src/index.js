@@ -64,7 +64,7 @@ form.addEventListener('submit', (e) => {
         .then((response) => feedParser(response))
         .then((parsingResult) => {
           watchedState.feeds.push(parsingResult.feed);
-          watchedState.items = state.items.concat(parsingResult.items);
+          watchedState.items = parsingResult.items.concat(state.items);
           /* console.log(state.feeds); */
           /* console.log(state.items); */
         })

@@ -5,6 +5,7 @@ export default {
       url: 'Это должен быть действительный URL',
       notOneOf: 'Такой URL уже есть в базе',
     },
-    submitBtn: 'Отправить',
+    submitBtn: 'Отправить', // Does not connect
+    viewBtn: 'Просмотр',
   },
 };
