@@ -40,7 +40,11 @@ export default onChange(state, (path, value) => {
       li.append(link);
 
       const button = document.createElement('button');
-      button.classList.add('button');
+      button.classList.add('btn', 'btn-primary', 'modal-show-button');
+      button.setAttribute('type', 'button');
+      button.setAttribute('data-bs-toggle', 'modal');
+      button.setAttribute('data-bs-target', '#exampleModal');
+      button.setAttribute('itemID', item.itemID);
       button.innerHTML = i18next.t('viewBtn');
       li.append(button);
 

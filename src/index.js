@@ -15,15 +15,30 @@ i18next.init({
 });
 
 const form = document.getElementById('form');
+const modalTitle = document.getElementsByClassName('modal-title');
+const modalDescription = document.getElementsByClassName('modal-body');
+const readCompletelyButton = document.getElementsByClassName('read-completely-button');
+
+const customizeModal = (itemID) => {
+  const requiredItem = state.items.filter((item) => item.itemID === Number(itemID));
+  readCompletelyButton.item(0).setAttribute('href', requiredItem[0].link);
+  modalTitle.item(0).innerText = requiredItem[0].title;
+  modalDescription.item(0).innerText = requiredItem[0].description;
+};
 
 const itemsRecheck = () => {
-  /* console.log('itemsRecheck!'); */
   state.feedsLinks.forEach((feedLink) => {
     axios
       .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${feedLink}`)
       .then((response) => itemsParser(response))
       .then((parsingResult) => {
-        watchedState.items = state.items.concat(parsingResult);
+        watchedState.items = parsingResult.concat(state.items);
+      })
+      .then(() => {
+        const buttons = document.querySelectorAll('button.modal-show-button');
+        buttons.forEach((button) => {
+          button.addEventListener('click', () => customizeModal(button.getAttribute('itemID')));
+        });
       })
       .catch((error) => {
         throw error;
@@ -34,7 +49,6 @@ const itemsRecheck = () => {
 
 const firstItemsRecheck = () => {
   if (state.isRecheckStarted === false) {
-    /* console.log('firstItemsRecheck!'); */
     state.isRecheckStarted = true;
     itemsRecheck();
   }
@@ -69,6 +83,12 @@ form.addEventListener('submit', (e) => {
           /* console.log(state.items); */
         })
         .then(() => {
+          const buttons = document.querySelectorAll('button.modal-show-button');
+          buttons.forEach((button) => {
+            button.addEventListener('click', () => customizeModal(button.getAttribute('itemID')));
+          });
+        })
+        .then(() => {
           state.feedsLinks.push(state.inputData);
         })
         .then(() => setTimeout(firstItemsRecheck, 5000))
@@ -81,5 +101,3 @@ form.addEventListener('submit', (e) => {
       throw error;
     });
 });
-
-// Писюкатая ссылка: https://worldoftanks.ru/ru/rss/news/
