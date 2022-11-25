@@ -34,9 +34,14 @@ export default onChange(state, (path, value) => {
     state.items.forEach((item) => {
       const li = document.createElement('li');
       const link = document.createElement('a');
-      link.classList.add('link', 'fw-bold');
+      if (state.viewedItems.indexOf(item.itemID) !== -1) {
+        link.classList.add('link', 'fw-normal');
+      } else {
+        link.classList.add('link', 'fw-bold');
+      }
       link.innerHTML = item.title;
       link.setAttribute('href', item.link);
+      link.setAttribute('itemID', item.itemID);
       li.append(link);
 
       const button = document.createElement('button');
@@ -50,5 +55,10 @@ export default onChange(state, (path, value) => {
 
       itemsDisplay.append(li);
     });
+  }
+  if (path === 'viewedItems') {
+    const currentLink = document.querySelector(`a[itemid='${value[value.length - 1]}']`);
+    currentLink.classList.remove('fw-bold');
+    currentLink.classList.add('fw-normal');
   }
 });

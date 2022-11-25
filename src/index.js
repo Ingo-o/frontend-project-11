@@ -24,6 +24,9 @@ const customizeModal = (itemID) => {
   readCompletelyButton.item(0).setAttribute('href', requiredItem[0].link);
   modalTitle.item(0).innerText = requiredItem[0].title;
   modalDescription.item(0).innerText = requiredItem[0].description;
+  if (state.viewedItems.indexOf(itemID) === -1) {
+    watchedState.viewedItems.push(Number(itemID));
+  }
 };
 
 const itemsRecheck = () => {

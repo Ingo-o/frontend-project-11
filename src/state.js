@@ -7,4 +7,5 @@ export default {
   itemsCount: 0,
   feeds: [],
   items: [],
+  viewedItems: [],
 };
