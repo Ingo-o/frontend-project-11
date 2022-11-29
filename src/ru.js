@@ -1,11 +1,16 @@
 export default {
   translation: {
-    validationErrors: {
-      required: 'Поле не должно быть пустым',
-      url: 'Это должен быть действительный URL',
-      notOneOf: 'Такой URL уже есть в базе',
-    },
-    submitBtn: 'Отправить', // Does not connect
+    success: 'RSS успешно загружен',
     viewBtn: 'Просмотр',
+
+    // Validation errors
+    blankField: 'Не должно быть пустым',
+    invalidUrl: 'Ссылка должна быть валидным URL',
+    rssAlreadyExists: 'RSS уже существует',
+
+    // Errors
+    parsingError: 'Ресурс не содержит валидный RSS',
+    axiosError: 'Просмотр, Ошибка сети',
+    unknownError: 'Что-то пошло не так',
   },
 };

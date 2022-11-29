@@ -8,4 +8,5 @@ export default {
   feeds: [],
   items: [],
   viewedItems: [],
+  feedback: null,
 };

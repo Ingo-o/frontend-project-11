@@ -29,11 +29,38 @@ const customizeModal = (itemID) => {
   }
 };
 
+const errorHandler = (error) => {
+  switch (error.name) {
+    case 'ValidationError':
+      watchedState.isValid = false;
+      watchedState.feedback = error.message;
+      break;
+    case 'AxiosError':
+      watchedState.feedback = i18next.t('axiosError');
+      break;
+    case 'ParsingError':
+      watchedState.feedback = i18next.t('parsingError');
+      break;
+    default:
+      watchedState.feedback = i18next.t('unknownError');
+      throw new Error('UnknownError');
+  }
+};
+
 const itemsRecheck = () => {
   state.feedsLinks.forEach((feedLink) => {
     axios
       .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${feedLink}`)
-      .then((response) => itemsParser(response))
+      // eslint-disable-next-line consistent-return
+      .then((response) => {
+        try {
+          return itemsParser(response);
+        } catch (error) {
+          const parsingError = new Error();
+          parsingError.name = 'ParsingError';
+          errorHandler(parsingError);
+        }
+      })
       .then((parsingResult) => {
         watchedState.items = parsingResult.concat(state.items);
       })
@@ -44,7 +71,7 @@ const itemsRecheck = () => {
         });
       })
       .catch((error) => {
-        throw error;
+        errorHandler(error);
       });
   });
   setTimeout(itemsRecheck, 5000);
@@ -66,9 +93,9 @@ form.addEventListener('submit', (e) => {
 
   const schema = yup
     .string()
-    .required(i18next.t('validationErrors.required'))
-    .url(i18next.t('validationErrors.url'))
-    .notOneOf(state.feedsLinks, i18next.t('validationErrors.notOneOf'));
+    .required(i18next.t('blankField'))
+    .url(i18next.t('invalidUrl'))
+    .notOneOf(state.feedsLinks, i18next.t('rssAlreadyExists'));
 
   schema
     .validate(state.inputData)
@@ -78,12 +105,20 @@ form.addEventListener('submit', (e) => {
     .then(() => {
       axios
         .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${state.inputData}`)
-        .then((response) => feedParser(response))
+        // eslint-disable-next-line consistent-return
+        .then((response) => {
+          try {
+            return feedParser(response);
+          } catch (error) {
+            const parsingError = new Error();
+            parsingError.name = 'ParsingError';
+            errorHandler(parsingError);
+          }
+        })
         .then((parsingResult) => {
           watchedState.feeds.push(parsingResult.feed);
           watchedState.items = parsingResult.items.concat(state.items);
-          /* console.log(state.feeds); */
-          /* console.log(state.items); */
+          watchedState.feedback = i18next.t('success');
         })
         .then(() => {
           const buttons = document.querySelectorAll('button.modal-show-button');
@@ -94,13 +129,9 @@ form.addEventListener('submit', (e) => {
         .then(() => {
           state.feedsLinks.push(state.inputData);
         })
-        .then(() => setTimeout(firstItemsRecheck, 5000))
-        .catch((error) => {
-          throw error;
-        });
+        .then(() => setTimeout(firstItemsRecheck, 5000));
     })
     .catch((error) => {
-      watchedState.isValid = false;
-      throw error;
+      errorHandler(error);
     });
 });

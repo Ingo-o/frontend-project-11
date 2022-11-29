@@ -2,12 +2,9 @@ import onChange from 'on-change';
 import i18next from 'i18next';
 import state from './state';
 
-const inputField = document.getElementById('url-input');
-const feedsDisplay = document.getElementById('feed');
-const itemsDisplay = document.getElementById('items');
-
 export default onChange(state, (path, value) => {
   if (path === 'isValid') {
+    const inputField = document.getElementById('url-input');
     if (value === true) {
       inputField.classList.remove('is-invalid');
     } else {
@@ -15,6 +12,7 @@ export default onChange(state, (path, value) => {
     }
   }
   if (path === 'feeds') {
+    const feedsDisplay = document.getElementById('feed');
     const lastAddedFeed = state.feeds[state.feeds.length - 1];
 
     const title = document.createElement('h1');
@@ -29,6 +27,7 @@ export default onChange(state, (path, value) => {
     feedsDisplay.prepend(title);
   }
   if (path === 'items') {
+    const itemsDisplay = document.getElementById('items');
     itemsDisplay.innerText = '';
 
     state.items.forEach((item) => {
@@ -60,5 +59,9 @@ export default onChange(state, (path, value) => {
     const currentLink = document.querySelector(`a[itemid='${value[value.length - 1]}']`);
     currentLink.classList.remove('fw-bold');
     currentLink.classList.add('fw-normal');
+  }
+  if (path === 'feedback') {
+    const feedback = document.getElementById('feedback');
+    feedback.innerText = value;
   }
 });
