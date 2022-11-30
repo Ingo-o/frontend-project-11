@@ -128,6 +128,7 @@ form.addEventListener('submit', (e) => {
         })
         .then(() => {
           state.feedsLinks.push(state.inputData);
+          state.inputData = '';
         })
         .then(() => setTimeout(firstItemsRecheck, 5000));
     })
