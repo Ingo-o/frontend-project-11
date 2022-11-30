@@ -18,6 +18,7 @@ const form = document.getElementById('form');
 const modalTitle = document.getElementsByClassName('modal-title');
 const modalDescription = document.getElementsByClassName('modal-body');
 const readCompletelyButton = document.getElementsByClassName('read-completely-button');
+const inputField = document.getElementById('url-input');
 
 const customizeModal = (itemID) => {
   const requiredItem = state.items.filter((item) => item.itemID === Number(itemID));
@@ -128,7 +129,7 @@ form.addEventListener('submit', (e) => {
         })
         .then(() => {
           state.feedsLinks.push(state.inputData);
-          state.inputData = '';
+          inputField.value = '';
         })
         .then(() => setTimeout(firstItemsRecheck, 5000));
     })
