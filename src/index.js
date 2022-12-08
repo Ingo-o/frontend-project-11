@@ -1,9 +1,10 @@
+/* eslint-disable no-param-reassign */
 import * as yup from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
 import ru from './ru';
 import state from './state';
-import { feedParser, itemsParser } from './parsers';
+import parser from './parsers';
 import watchedState from './watchedState';
 
 i18next.init({
@@ -15,19 +16,17 @@ i18next.init({
 });
 
 const form = document.getElementById('form');
-const modalTitle = document.getElementsByClassName('modal-title');
-const modalDescription = document.getElementsByClassName('modal-body');
-const readCompletelyButton = document.getElementsByClassName('read-completely-button');
 const inputField = document.getElementById('url-input');
+const itemsContainer = document.querySelector('#items');
 
-const customizeModal = (itemID) => {
-  const requiredItem = state.items.filter((item) => item.itemID === Number(itemID));
-  readCompletelyButton.item(0).setAttribute('href', requiredItem[0].link);
-  modalTitle.item(0).innerText = requiredItem[0].title;
-  modalDescription.item(0).innerText = requiredItem[0].description;
-  if (state.viewedItems.indexOf(itemID) === -1) {
-    watchedState.viewedItems.push(Number(itemID));
-  }
+const validation = (url) => {
+  const schema = yup
+    .string()
+    .required(i18next.t('blankField'))
+    .url(i18next.t('invalidUrl'))
+    .notOneOf(state.feedsLinks, i18next.t('rssAlreadyExists'));
+
+  return schema.validate(url);
 };
 
 const errorHandler = (error) => {
@@ -49,32 +48,39 @@ const errorHandler = (error) => {
 };
 
 const itemsRecheck = () => {
+  // Promise.all (const promises = state.feedsLinks.map((feedLink))
   state.feedsLinks.forEach((feedLink) => {
     axios
       .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${feedLink}`)
-      // eslint-disable-next-line consistent-return
       .then((response) => {
         try {
-          return itemsParser(response);
+          return parser(response);
         } catch (error) {
           const parsingError = new Error();
           parsingError.name = 'ParsingError';
-          errorHandler(parsingError);
+          throw parsingError;
         }
       })
       .then((parsingResult) => {
-        watchedState.items = parsingResult.concat(state.items);
-      })
-      .then(() => {
-        const buttons = document.querySelectorAll('button.modal-show-button');
-        buttons.forEach((button) => {
-          button.addEventListener('click', () => customizeModal(button.getAttribute('itemID')));
+        const { items } = parsingResult;
+        const alreadyAddedItemsTitles = state.items.map((item) => item.title);
+        const newItems = items.filter((item) => !alreadyAddedItemsTitles.includes(item.title));
+        if (newItems.length === 0) {
+          return;
+        }
+
+        newItems.map((item) => {
+          state.itemsCount += 1;
+          return { itemID: state.itemsCount, ...item };
         });
+
+        watchedState.items = parsingResult.concat(newItems);
       })
       .catch((error) => {
         errorHandler(error);
       });
   });
+  // должно вызваться после успешного получения данных. (использовать finally)
   setTimeout(itemsRecheck, 5000);
 };
 
@@ -85,55 +91,53 @@ const firstItemsRecheck = () => {
   }
 };
 
-form.addEventListener('change', (e) => {
-  state.inputData = e.target.value;
-});
-
 form.addEventListener('submit', (e) => {
   e.preventDefault();
+  const formData = new FormData(form);
+  const url = formData.get('url');
 
-  const schema = yup
-    .string()
-    .required(i18next.t('blankField'))
-    .url(i18next.t('invalidUrl'))
-    .notOneOf(state.feedsLinks, i18next.t('rssAlreadyExists'));
-
-  schema
-    .validate(state.inputData)
+  validation(url)
     .then(() => {
       watchedState.isValid = true;
     })
-    .then(() => {
-      axios
-        .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${state.inputData}`)
-        // eslint-disable-next-line consistent-return
-        .then((response) => {
-          try {
-            return feedParser(response);
-          } catch (error) {
-            const parsingError = new Error();
-            parsingError.name = 'ParsingError';
-            errorHandler(parsingError);
-          }
-        })
-        .then((parsingResult) => {
-          watchedState.feeds.push(parsingResult.feed);
-          watchedState.items = parsingResult.items.concat(state.items);
-          watchedState.feedback = i18next.t('success');
-        })
-        .then(() => {
-          const buttons = document.querySelectorAll('button.modal-show-button');
-          buttons.forEach((button) => {
-            button.addEventListener('click', () => customizeModal(button.getAttribute('itemID')));
-          });
-        })
-        .then(() => {
-          state.feedsLinks.push(state.inputData);
-          inputField.value = '';
-        })
-        .then(() => setTimeout(firstItemsRecheck, 5000));
+    .then(() => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`))
+    .then((response) => {
+      try {
+        return parser(response);
+      } catch (error) {
+        const parsingError = new Error();
+        parsingError.name = 'ParsingError';
+        throw parsingError;
+      }
     })
+    .then((parsingResult) => {
+      const { items } = parsingResult;
+      items.forEach((item) => {
+        state.itemsCount += 1;
+        item.itemID = state.itemsCount;
+      });
+
+      watchedState.feeds.push(parsingResult.feed);
+      watchedState.items = parsingResult.items.concat(state.items);
+      watchedState.feedback = i18next.t('success');
+    })
+    .then(() => {
+      state.feedsLinks.push(url);
+      inputField.value = '';
+    })
+    .then(() => setTimeout(firstItemsRecheck, 5000))
     .catch((error) => {
       errorHandler(error);
     });
+});
+
+itemsContainer.addEventListener('click', (e) => {
+  const { target } = e;
+  if (target.classList.contains('modal-show-button')) {
+    const itemID = target.getAttribute('itemID');
+    watchedState.modalWindow = itemID;
+    if (state.viewedItems.indexOf(itemID) === -1) {
+      watchedState.viewedItems.push(Number(itemID));
+    }
+  }
 });

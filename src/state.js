@@ -1,9 +1,8 @@
 export default {
   isValid: null,
   isRecheckStarted: false,
-  inputData: null,
+  modalWindow: null,
   feedsLinks: [],
-  feedsCount: 0,
   itemsCount: 0,
   feeds: [],
   items: [],

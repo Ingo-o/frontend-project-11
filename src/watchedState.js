@@ -64,4 +64,13 @@ export default onChange(state, (path, value) => {
     const feedback = document.getElementById('feedback');
     feedback.innerText = value;
   }
+  if (path === 'modalWindow') {
+    const modalTitle = document.getElementsByClassName('modal-title');
+    const modalDescription = document.getElementsByClassName('modal-body');
+    const readCompletelyButton = document.getElementsByClassName('read-completely-button');
+    const requiredItem = state.items.filter((item) => item.itemID === Number(value));
+    readCompletelyButton.item(0).setAttribute('href', requiredItem[0].link);
+    modalTitle.item(0).innerText = requiredItem[0].title;
+    modalDescription.item(0).innerText = requiredItem[0].description;
+  }
 });
