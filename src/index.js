@@ -7,7 +7,7 @@ import state from './state';
 import parser from './parsers';
 import watchedState from './watchedState';
 
-// Спросить про Prettier и Lorem
+// Спросить про Prettier, Lorem и запрос возвращающий 404
 
 i18next.init({
   lng: 'ru',

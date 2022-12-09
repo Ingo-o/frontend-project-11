@@ -34,9 +34,9 @@ export default onChange(state, (path, value) => {
       const li = document.createElement('li');
       const link = document.createElement('a');
       if (state.viewedItems.indexOf(item.itemID) !== -1) {
-        link.classList.add('link', 'fw-normal');
+        link.classList.add('fw-normal');
       } else {
-        link.classList.add('link', 'fw-bold');
+        link.classList.add('fw-bold');
       }
       link.innerHTML = item.title;
       link.setAttribute('href', item.link);
