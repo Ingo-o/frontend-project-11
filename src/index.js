@@ -7,6 +7,8 @@ import state from './state';
 import parser from './parsers';
 import watchedState from './watchedState';
 
+// Спросить про Prettier и Lorem
+
 i18next.init({
   lng: 'ru',
   debug: true,
@@ -48,19 +50,10 @@ const errorHandler = (error) => {
 };
 
 const itemsRecheck = () => {
-  // Promise.all (const promises = state.feedsLinks.map((feedLink))
-  state.feedsLinks.forEach((feedLink) => {
+  const promises = state.feedsLinks.forEach((feedLink) => {
     axios
       .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${feedLink}`)
-      .then((response) => {
-        try {
-          return parser(response);
-        } catch (error) {
-          const parsingError = new Error();
-          parsingError.name = 'ParsingError';
-          throw parsingError;
-        }
-      })
+      .then((response) => parser(response))
       .then((parsingResult) => {
         const { items } = parsingResult;
         const alreadyAddedItemsTitles = state.items.map((item) => item.title);
@@ -69,19 +62,23 @@ const itemsRecheck = () => {
           return;
         }
 
-        newItems.map((item) => {
+        newItems.forEach((item) => {
           state.itemsCount += 1;
           return { itemID: state.itemsCount, ...item };
         });
 
-        watchedState.items = parsingResult.concat(newItems);
+        watchedState.items = newItems.concat(state.items);
       })
       .catch((error) => {
         errorHandler(error);
       });
   });
-  // должно вызваться после успешного получения данных. (использовать finally)
-  setTimeout(itemsRecheck, 5000);
+  // Если сломается одна ссылка, то все остальные тоже не будут обновлены?
+  // Может имеет смысл, в случае с recheck, при ошибке одного из промисов
+  // прекращать выполнение конкретного промиса без throw error?
+
+  const promise = Promise.all(promises);
+  promise.finally(setTimeout(itemsRecheck, 5000));
 };
 
 const firstItemsRecheck = () => {
@@ -101,15 +98,7 @@ form.addEventListener('submit', (e) => {
       watchedState.isValid = true;
     })
     .then(() => axios.get(`https://allorigins.hexlet.app/get?disableCache=true&url=${url}`))
-    .then((response) => {
-      try {
-        return parser(response);
-      } catch (error) {
-        const parsingError = new Error();
-        parsingError.name = 'ParsingError';
-        throw parsingError;
-      }
-    })
+    .then((response) => parser(response))
     .then((parsingResult) => {
       const { items } = parsingResult;
       items.forEach((item) => {
