@@ -8,6 +8,7 @@ import parser from './parsers';
 import watchedState from './watchedState';
 
 // Спросить про Prettier, Lorem и запрос возвращающий 404
+// Спросить про Bootstrap
 
 i18next.init({
   lng: 'ru',
