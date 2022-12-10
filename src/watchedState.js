@@ -1,6 +1,11 @@
 import onChange from 'on-change';
 import i18next from 'i18next';
+// TODO: Состояние приложения задается внутри функции, а не на уровне модуля
 import state from './state';
+
+/* export default (state, i18next, elements) =>
+  onChange(state, (path, value) => {
+    if (path === 'isValid') { */
 
 export default onChange(state, (path, value) => {
   if (path === 'isValid') {

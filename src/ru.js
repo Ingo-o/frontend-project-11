@@ -1,3 +1,5 @@
+// TODO: переводы сложить в отдельную папочку locales, добавить английский
+
 export default {
   translation: {
     success: 'RSS успешно загружен',

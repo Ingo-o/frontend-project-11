@@ -1,7 +1,16 @@
+// TODO: Парсинг чистая функция, на вход данные (строка rss), на выходе объект (не dom!)
+// Имена всех свойств (кроме item) должны оставаться такими, какими они были в RSS.
+// Парсинг не должен менять структуру. Установка id - не ответственность парсера.
+
 const parser = (incomingData) => {
   try {
     const newParser = new DOMParser();
-    const data = newParser.parseFromString(incomingData.data.contents, 'application/xml');
+    const data = newParser.parseFromString(incomingData.data.contents, 'text/xml');
+    /* data.querySelector('parseerror') {
+         const parsingError = new Error();
+         parsingError.isParsingError = true;
+         throw ...
+    } */
 
     const feed = {
       feedID: data.querySelector('link').textContent,
@@ -18,6 +27,8 @@ const parser = (incomingData) => {
     }));
 
     return { feed, items };
+    // TODO: ошибки парсинга обрабатываются несколько иначе
+    // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#error_handling
   } catch (error) {
     const parsingError = new Error();
     parsingError.name = 'ParsingError';
