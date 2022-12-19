@@ -1,13 +1,14 @@
 /* eslint-disable no-param-reassign */
 // Спросить про Bootstrap
+// Кнопка - undefined
 // Исправить ошибки написанные на HEXLET!
 import * as yup from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
-import ru from './ru';
+import ru from './locales/ru';
 import state from './state';
 import parser from './parsers';
-import watchedState from './watchedState'; // watch
+import watchedState from './watchedState';
 
 // https://ru.hexlet.io/blog/posts/skripty-moduli-i-biblioteki
 // https://ru.hexlet.io/courses/js-frontend-architecture/lessons/initialization/theory_unit
@@ -23,16 +24,14 @@ export default () => {
     },
   });
 
-  // const watchedState = watch(elements, initState, i18nextInstance);
-
   const form = document.getElementById('form');
   const inputField = document.getElementById('url-input');
-  const itemsContainer = document.querySelector('#items');
+  const postsContainer = document.querySelector('#posts');
 
   const validation = (url) => {
     const schema = yup
       .string()
-    // TODO: переводы должны применяться только в самом конце, до этого работа должна происходить с ключами (yup.setLocale)
+      // TODO: переводы должны применяться только в самом конце, до этого работа должна происходить с ключами (yup.setLocale)
       .required(i18n.t('blankField'))
       .url(i18n.t('invalidUrl'))
       .notOneOf(state.feedsLinks, i18n.t('rssAlreadyExists'));
@@ -41,6 +40,10 @@ export default () => {
   };
 
   const errorHandler = (error) => {
+    console.log(error);
+    console.log(error.name);
+    console.log(error.validationError);
+
     /* if (error.isAxiosError) {
       return 'network';
     }
@@ -53,12 +56,14 @@ export default () => {
     } */
 
     switch (error.name) {
+      // TODO: в состоянии сохраняются только ключи переводов (???)
       case 'ValidationError':
         watchedState.isValid = false;
-        // TODO: в состоянии сохраняются только ключи переводов
         watchedState.feedback = error.message;
         break;
-        // корректнее привести все в стиль axios, isParsingError и isAxiosError
+        // Корректнее привести все в стиль axios, isParsingError и isAxiosError
+        // Каким образом добавить параметр isValidationError в ошибку валидации?
+        // Добавлять его так же как в случае с парсером? Не сложно ли?
       case 'AxiosError':
         watchedState.feedback = i18n.t('axiosError'); // network
         break;
@@ -71,44 +76,40 @@ export default () => {
     }
   };
 
-  const itemsRecheck = () => {
+  const constructUrl = (link) => {
+    const newUrl = new URL('https://allorigins.hexlet.app/get');
+    newUrl.searchParams.set('disableCache', 'true');
+    newUrl.searchParams.set('url', link);
+    return newUrl;
+  };
+
+  const postsRecheck = () => {
     const promises = state.feedsLinks.map((feedLink) => axios
-    // TODO: формирование проксированное Url вынести в отдельную функцию,
-    // использовать new URL(...) и searchParams
-      .get(`https://allorigins.hexlet.app/get?disableCache=true&url=${feedLink}`)
+      .get(constructUrl(feedLink))
       .then((response) => parser(response))
       .then((parsingResult) => {
-        const { items } = parsingResult;
-        const alreadyAddedItemsTitles = state.items.map((item) => item.title);
-        const newItems = items.filter((item) => !alreadyAddedItemsTitles.includes(item.title));
-        if (newItems.length === 0) {
-        // Проверить еще раз
+        const { feed, posts } = parsingResult;
+        const alreadyAddedPostsTitles = state.posts.map((post) => post.title);
+        const newPosts = posts.filter((post) => !alreadyAddedPostsTitles.includes(post.title));
+        if (newPosts.length === 0) {
           return;
         }
 
-        newItems.forEach((item) => {
-          state.itemsCount += 1;
-          return { itemID: state.itemsCount, ...item };
+        newPosts.forEach((post) => {
+          state.postsCount += 1;
+          post.postID = state.postsCount;
+          post.feedID = feed.link;
+          return post;
         });
 
-        watchedState.items = newItems.concat(state.items);
+        watchedState.posts = newPosts.concat(state.posts);
       })
       .catch((error) => {
+        // eslint-disable-next-line no-console
         console.error(error);
-      // errorHandler(error);
       }));
-    // Если сломается одна ссылка, то все остальные тоже не будут обновлены?
-    // Может имеет смысл, в случае с recheck, при ошибке одного из промисов
-    // прекращать выполнение конкретного промиса без throw error?
 
-    Promise.all(promises).finally(setTimeout(itemsRecheck, 5000));
-  };
-
-  const firstItemsRecheck = () => {
-    if (state.isRecheckStarted === false) {
-      state.isRecheckStarted = true;
-      itemsRecheck();
-    }
+    Promise.all(promises).finally(setTimeout(postsRecheck, 5000));
   };
 
   form.addEventListener('submit', (e) => {
@@ -120,41 +121,39 @@ export default () => {
       .then(() => {
         watchedState.isValid = true;
       })
-      .then(() => axios.get(
-        `https://allorigins.hexlet.app/get?disableCache=true&url=${url}`,
-      ))
+      .then(() => axios.get(constructUrl(url)))
       .then((response) => parser(response))
       .then((parsingResult) => {
-        const { items } = parsingResult;
-        items.forEach((item) => {
-          state.itemsCount += 1;
-          item.itemID = state.itemsCount;
+        const { feed, posts } = parsingResult;
+        feed.feedID = feed.link;
+        posts.forEach((post) => {
+          state.postsCount += 1;
+          post.postID = state.postsCount;
+          post.feedID = feed.link;
         });
 
         watchedState.feeds.push(parsingResult.feed);
-        watchedState.items = parsingResult.items.concat(state.items);
+        watchedState.posts = parsingResult.posts.concat(state.posts);
         watchedState.feedback = i18n.t('success');
       })
       .then(() => {
         state.feedsLinks.push(url);
         inputField.value = '';
       })
-      .then(() => setTimeout(firstItemsRecheck, 5000)) // Перепроверить
+      .then(() => setTimeout(postsRecheck, 5000))
       .catch((error) => {
         errorHandler(error);
       });
   });
 
-  itemsContainer.addEventListener('click', (e) => {
+  postsContainer.addEventListener('click', (e) => {
     const { target } = e;
     if (target.classList.contains('modal-show-button')) {
-      const itemID = target.getAttribute('itemID');
-      watchedState.modalWindow = itemID;
-      if (state.viewedItems.indexOf(itemID) === -1) {
-        watchedState.viewedItems.push(Number(itemID));
+      const postID = target.getAttribute('postID');
+      watchedState.modalWindow = postID;
+      if (state.viewedPosts.indexOf(postID) === -1) {
+        watchedState.viewedPosts.push(Number(postID));
       }
     }
   });
 };
-
-// setTimeout(() => itemsRecheck(watchedState), 5000);
