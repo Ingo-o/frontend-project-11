@@ -29,4 +29,4 @@ export default parser;
 // https://developer.mozilla.org/en-US/docs/Web/API/DOMParser/parseFromString#error_handling
 
 // Не работает, так как, парсинг может вернуть результат (не ошибку), но этот результат не будет соответствовать нужному нам
-// и парсинг упадет с unknown error. https://uastend.com/ribbon/feed/ - у item нет description
+// и парсинг упадет с unknown error. Например, у https://uastend.com/ribbon/feed/ - у item нет description

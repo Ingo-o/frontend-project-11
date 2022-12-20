@@ -2,6 +2,8 @@
 // Спросить про Bootstrap
 // Кнопка - undefined
 // Исправить ошибки написанные на HEXLET!
+// https://ru.hexlet.io/blog/posts/skripty-moduli-i-biblioteki
+// https://ru.hexlet.io/courses/js-frontend-architecture/lessons/initialization/theory_unit
 import * as yup from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
@@ -9,9 +11,6 @@ import ru from './locales/ru';
 import state from './state';
 import parser from './parsers';
 import watchedState from './watchedState';
-
-// https://ru.hexlet.io/blog/posts/skripty-moduli-i-biblioteki
-// https://ru.hexlet.io/courses/js-frontend-architecture/lessons/initialization/theory_unit
 
 export default () => {
   const i18n = i18next.createInstance();
@@ -31,7 +30,8 @@ export default () => {
   const validation = (url) => {
     const schema = yup
       .string()
-      // TODO: переводы должны применяться только в самом конце, до этого работа должна происходить с ключами (yup.setLocale)
+      // TODO: переводы должны применяться только в самом конце,
+      // до этого работа должна происходить с ключами (yup.setLocale)
       .required(i18n.t('blankField'))
       .url(i18n.t('invalidUrl'))
       .notOneOf(state.feedsLinks, i18n.t('rssAlreadyExists'));
@@ -43,6 +43,9 @@ export default () => {
     console.log(error);
     console.log(error.name);
     console.log(error.validationError);
+    // Корректнее привести все в стиль axios, isParsingError и isAxiosError
+    // Каким образом добавить параметр isValidationError в ошибку валидации?
+    // Добавлять его так же как в случае с парсером? Не сложно ли?
 
     /* if (error.isAxiosError) {
       return 'network';
@@ -56,21 +59,18 @@ export default () => {
     } */
 
     switch (error.name) {
-      // TODO: в состоянии сохраняются только ключи переводов (???)
+      // TODO: в состоянии сохраняются только ключи переводов
       case 'ValidationError':
         watchedState.isValid = false;
         watchedState.feedback = error.message;
         break;
-        // Корректнее привести все в стиль axios, isParsingError и isAxiosError
-        // Каким образом добавить параметр isValidationError в ошибку валидации?
-        // Добавлять его так же как в случае с парсером? Не сложно ли?
       case 'AxiosError':
-        watchedState.feedback = i18n.t('axiosError'); // network
+        watchedState.feedback = i18n.t('axiosError');
         break;
       case 'ParsingError':
-        watchedState.feedback = i18n.t('parsingError'); // parsing
+        watchedState.feedback = i18n.t('parsingError');
         break;
-      default: // unknown
+      default:
         watchedState.feedback = 'unknownError';
         throw new Error('UnknownError');
     }
