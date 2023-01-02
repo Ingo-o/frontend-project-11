@@ -17,6 +17,7 @@ export default () => {
   const elements = {
     form: document.getElementById('form'),
     inputField: document.getElementById('url-input'),
+    submitButton: document.getElementById('submit-btn'),
     feedsDisplay: document.getElementById('feed'),
     postsContainer: document.querySelector('#posts'),
     postsDisplay: document.getElementById('posts'),
@@ -61,10 +62,13 @@ export default () => {
         watchedState.form.error = error.message.key;
       } else if (error.isAxiosError) {
         watchedState.loadingProcess.error = 'axiosError';
+        watchedState.loadingProcess.status = 'failed';
       } else if (error.isParsingError) {
         watchedState.loadingProcess.error = 'parsingError';
+        watchedState.loadingProcess.status = 'failed';
       } else {
         watchedState.loadingProcess.error = 'unknownError';
+        watchedState.loadingProcess.status = 'failed';
         throw new Error('UnknownError');
       }
     };
@@ -115,7 +119,10 @@ export default () => {
           watchedState.form.isValid = true;
           watchedState.form.error = null;
         })
-        .then(() => axios.get(constructUrl(url)))
+        .then(() => {
+          watchedState.loadingProcess.status = 'loading';
+          return axios.get(constructUrl(url));
+        })
         .then((response) => parser(response))
         .then((parsingResult) => {
           const { feed, posts } = parsingResult;
@@ -128,9 +135,8 @@ export default () => {
 
           watchedState.feeds.push(parsingResult.feed);
           watchedState.posts = parsingResult.posts.concat(state.posts);
-          // watchedState.feedback = 'success';
-          elements.inputField.value = ''; // Перенести в watchedState в случае success
           watchedState.loadingProcess.error = null;
+          watchedState.loadingProcess.status = 'idle';
         })
         .then(() => {
           state.feedsLinks.push(url);

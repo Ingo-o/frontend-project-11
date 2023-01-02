@@ -12,7 +12,7 @@ export default {
   },
 
   loadingProcess: {
-    status: 'idle', // 'loading', 'failed'
+    status: 'idle',
     error: null,
   },
 };

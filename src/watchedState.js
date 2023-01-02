@@ -60,6 +60,22 @@ export default (state, elements, i18n) => {
     if (path === 'form.error' || path === 'loadingProcess.error') {
       elements.feedback.innerText = i18n.t(value);
     }
+    if (path === 'loadingProcess.status') {
+      if (value === 'idle') {
+        elements.inputField.value = '';
+        elements.feedback.innerText = i18n.t('success');
+        elements.inputField.classList.remove('is-invalid');
+        elements.inputField.disabled = false;
+        elements.submitButton.disabled = false;
+      } else if (value === 'loading') {
+        elements.inputField.disabled = true;
+        elements.submitButton.disabled = true;
+      } else if (value === 'failed') {
+        elements.inputField.classList.add('is-invalid');
+        elements.inputField.disabled = false;
+        elements.submitButton.disabled = false;
+      }
+    }
     if (path === 'modalWindow') {
       const requiredPost = state.posts.filter((post) => post.postID === Number(value));
       elements.readCompletelyButton.item(0).setAttribute('href', requiredPost[0].link);
