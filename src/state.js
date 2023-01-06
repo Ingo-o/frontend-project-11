@@ -1,9 +1,7 @@
 export default {
   feeds: [],
   posts: [],
-  viewedPosts: [],
-  feedsLinks: [],
-  postsCount: 0,
+  viewedPosts: new Set(),
   modalWindow: null,
 
   form: {

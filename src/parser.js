@@ -1,6 +1,6 @@
-const parser = (incomingData) => {
+const parseRSS = (RSS) => {
   const newParser = new DOMParser();
-  const data = newParser.parseFromString(incomingData.data.contents, 'text/xml');
+  const data = newParser.parseFromString(RSS.data.contents, 'text/xml');
   const errorNode = data.querySelector('parsererror');
   if (errorNode) {
     const parsingError = new Error();
@@ -23,4 +23,4 @@ const parser = (incomingData) => {
   }
 };
 
-export default parser;
+export default parseRSS;

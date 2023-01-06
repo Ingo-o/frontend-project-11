@@ -1,14 +1,11 @@
 /* eslint-disable no-param-reassign */
-// Спросить про Bootstrap
-// Исправить ошибки написанные на HEXLET!
-// https://ru.hexlet.io/blog/posts/skripty-moduli-i-biblioteki
-// https://ru.hexlet.io/courses/js-frontend-architecture/lessons/initialization/theory_unit
 import * as yup from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
+import lodash from 'lodash';
 import ru from './locales/ru';
 import state from './state';
-import parser from './parsers';
+import parseRSS from './parser';
 import watch from './watchedState';
 
 export default () => {
@@ -18,7 +15,7 @@ export default () => {
     form: document.getElementById('form'),
     inputField: document.getElementById('url-input'),
     submitButton: document.getElementById('submit-btn'),
-    feedsDisplay: document.getElementById('feed'),
+    feedsDisplay: document.getElementById('feeds'),
     postsContainer: document.querySelector('#posts'),
     postsDisplay: document.getElementById('posts'),
     feedback: document.getElementById('feedback'),
@@ -46,29 +43,25 @@ export default () => {
 
     const watchedState = watch(state, elements, i18n);
 
-    const validation = (url) => {
+    const validateUrl = (url, links) => {
       const schema = yup
         .string()
         .required()
         .url()
-        .notOneOf(state.feedsLinks);
+        .notOneOf(links);
 
       return schema.validate(url);
     };
 
     const errorHandler = (error) => {
       if (error.message.isValidationError) {
-        watchedState.form.isValid = false;
-        watchedState.form.error = error.message.key;
+        watchedState.form = { isValid: false, error: error.message.key };
       } else if (error.isAxiosError) {
-        watchedState.loadingProcess.error = 'axiosError';
-        watchedState.loadingProcess.status = 'failed';
+        watchedState.loadingProcess = { status: 'failed', error: 'axiosError' };
       } else if (error.isParsingError) {
-        watchedState.loadingProcess.error = 'parsingError';
-        watchedState.loadingProcess.status = 'failed';
+        watchedState.loadingProcess = { status: 'failed', error: 'parsingError' };
       } else {
-        watchedState.loadingProcess.error = 'unknownError';
-        watchedState.loadingProcess.status = 'failed';
+        watchedState.loadingProcess = { status: 'failed', error: 'unknownError' };
         throw new Error('UnknownError');
       }
     };
@@ -81,25 +74,19 @@ export default () => {
     };
 
     const postsRecheck = () => {
-      const promises = state.feedsLinks.map((feedLink) => axios
-        .get(constructUrl(feedLink))
-        .then((response) => parser(response))
+      const promises = state.feeds.map((feed) => axios
+        .get(constructUrl(feed.link))
+        .then((response) => parseRSS(response))
         .then((parsingResult) => {
-          const { feed, posts } = parsingResult;
-          const alreadyAddedPostsTitles = state.posts.map((post) => post.title);
-          const newPosts = posts.filter((post) => !alreadyAddedPostsTitles.includes(post.title));
-          if (newPosts.length === 0) {
-            return;
-          }
+          const { posts } = parsingResult;
+          const newPosts = lodash.differenceWith(posts, state.posts, (p1, p2) => p1.title === p2.title)
+            .map((post) => {
+              post.postID = lodash.uniqueId();
+              post.feedID = feed.link;
+              return post;
+            });
 
-          newPosts.forEach((post) => {
-            state.postsCount += 1;
-            post.postID = state.postsCount;
-            post.feedID = feed.link;
-            return post;
-          });
-
-          watchedState.posts = newPosts.concat(state.posts);
+          watchedState.posts.unshift(...newPosts);
         })
         .catch((error) => {
         // eslint-disable-next-line no-console
@@ -113,49 +100,43 @@ export default () => {
       e.preventDefault();
       const formData = new FormData(elements.form);
       const url = formData.get('url');
+      const alreadyAddedLinks = state.feeds.map((feed) => feed.link);
 
-      validation(url)
+      validateUrl(url, alreadyAddedLinks)
         .then(() => {
-          watchedState.form.isValid = true;
-          watchedState.form.error = null;
+          watchedState.form = { isValid: true, error: null };
         })
         .then(() => {
-          watchedState.loadingProcess.status = 'loading';
+          watchedState.loadingProcess = { status: 'loading' };
           return axios.get(constructUrl(url));
         })
-        .then((response) => parser(response))
+        .then((response) => parseRSS(response))
         .then((parsingResult) => {
           const { feed, posts } = parsingResult;
-          feed.feedID = feed.link;
-          posts.forEach((post) => {
-            state.postsCount += 1;
-            post.postID = state.postsCount;
-            post.feedID = feed.link;
+          feed.feedID = url;
+          feed.link = url; // Нужен ли этот параметр? Может лучше пробежаться по ID?
+          const newPosts = posts.map((post) => {
+            post.postID = lodash.uniqueId();
+            post.feedID = url;
+            return post;
           });
 
           watchedState.feeds.push(parsingResult.feed);
-          watchedState.posts = parsingResult.posts.concat(state.posts);
-          watchedState.loadingProcess.error = null;
-          watchedState.loadingProcess.status = 'idle';
+          watchedState.posts = newPosts.concat(state.posts);
+          watchedState.loadingProcess = { status: 'idle', error: null };
         })
-        .then(() => {
-          state.feedsLinks.push(url);
-        })
-        .then(() => setTimeout(postsRecheck, 5000))
         .catch((error) => {
           errorHandler(error);
         });
     });
 
+    setTimeout(postsRecheck, 5000);
+
     elements.postsContainer.addEventListener('click', (e) => {
       const { target } = e;
-      if (target.classList.contains('modal-show-button')) {
-        const postID = target.getAttribute('postID');
-        watchedState.modalWindow = postID;
-        if (state.viewedPosts.indexOf(postID) === -1) {
-          watchedState.viewedPosts.push(Number(postID));
-        }
-      }
+      const postID = target.getAttribute('postID');
+      watchedState.modalWindow = postID;
+      watchedState.viewedPosts.add(postID);
     });
   });
 };
