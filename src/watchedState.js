@@ -88,10 +88,10 @@ const handlePosts = (state, elements, i18n) => {
 };
 
 const handleModalWindow = (state, elements) => {
-  const requiredPost = state.posts.filter((post) => post.postID === state.modalWindow);
-  elements.readCompletelyButton.item(0).setAttribute('href', requiredPost[0].link);
-  elements.modalTitle.item(0).innerText = requiredPost[0].title;
-  elements.modalDescription.item(0).innerText = requiredPost[0].description;
+  const requiredPost = state.posts.find((post) => post.postID === state.modalWindow);
+  elements.readCompletelyButton.setAttribute('href', requiredPost.link);
+  elements.modalTitle.innerText = requiredPost.title;
+  elements.modalDescription.innerText = requiredPost.description;
 };
 
 export default (state, elements, i18n) => {

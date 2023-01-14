@@ -19,9 +19,9 @@ export default () => {
     postsContainer: document.querySelector('#posts'),
     postsDisplay: document.getElementById('posts'),
     feedback: document.getElementById('feedback'),
-    modalTitle: document.getElementsByClassName('modal-title'),
-    modalDescription: document.getElementsByClassName('modal-body'),
-    readCompletelyButton: document.getElementsByClassName('read-completely-button'),
+    modalTitle: document.getElementById('exampleModalLabel'),
+    modalDescription: document.getElementById('modalBody'),
+    readCompletelyButton: document.getElementById('readCompletelyButton'),
   };
 
   i18n.init({
