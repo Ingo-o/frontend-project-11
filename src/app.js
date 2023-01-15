@@ -79,7 +79,8 @@ export default () => {
         .then((response) => parseRSS(response))
         .then((parsingResult) => {
           const { posts } = parsingResult;
-          const newPosts = lodash.differenceWith(posts, state.posts, (p1, p2) => p1.title === p2.title)
+          const newPosts = lodash
+            .differenceWith(posts, state.posts, (p1, p2) => p1.title === p2.title)
             .map((post) => {
               post.postID = lodash.uniqueId();
               post.feedID = feed.link;
@@ -114,7 +115,7 @@ export default () => {
         .then((parsingResult) => {
           const { feed, posts } = parsingResult;
           feed.feedID = url;
-          feed.link = url; // Нужен ли этот параметр? Может лучше пробежаться по ID?
+          feed.link = url;
           const newPosts = posts.map((post) => {
             post.postID = lodash.uniqueId();
             post.feedID = url;
