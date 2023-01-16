@@ -3,6 +3,7 @@ import * as yup from 'yup';
 import i18next from 'i18next';
 import axios from 'axios';
 import lodash from 'lodash';
+import 'bootstrap';
 import ru from './locales/ru';
 import state from './state';
 import parseRSS from './parser';
@@ -16,7 +17,6 @@ export default () => {
     inputField: document.getElementById('url-input'),
     submitButton: document.getElementById('submit-btn'),
     feedsDisplay: document.getElementById('feeds'),
-    postsContainer: document.querySelector('#posts'),
     postsDisplay: document.getElementById('posts'),
     feedback: document.getElementById('feedback'),
     modalTitle: document.getElementById('exampleModalLabel'),
@@ -133,7 +133,7 @@ export default () => {
 
     setTimeout(postsRecheck, 5000);
 
-    elements.postsContainer.addEventListener('click', (e) => {
+    elements.postsDisplay.addEventListener('click', (e) => {
       const { target } = e;
       const postID = target.getAttribute('postID');
       watchedState.modalWindow = postID;

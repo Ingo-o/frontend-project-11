@@ -21,6 +21,8 @@ const handleLoadingProcess = (state, elements, i18n) => {
   if (state.loadingProcess.status === 'idle') {
     elements.inputField.value = '';
     elements.feedback.innerText = i18n.t('success');
+    elements.feedback.classList.remove('text-danger'); // HERE!
+    elements.feedback.classList.add('text-success'); // HERE!
     elements.inputField.classList.remove('is-invalid');
     elements.inputField.disabled = false;
     elements.submitButton.disabled = false;
@@ -29,6 +31,8 @@ const handleLoadingProcess = (state, elements, i18n) => {
     elements.submitButton.disabled = true;
   } else if (state.loadingProcess.status === 'failed') {
     elements.inputField.classList.add('is-invalid');
+    elements.feedback.classList.remove('text-success'); // HERE!
+    elements.feedback.classList.add('text-danger'); // HERE!
     elements.inputField.disabled = false;
     elements.submitButton.disabled = false;
   }
