@@ -19,7 +19,7 @@ export default () => {
     feedsDisplay: document.getElementById('feeds'),
     postsDisplay: document.getElementById('posts'),
     feedback: document.getElementById('feedback'),
-    modalTitle: document.getElementById('exampleModalLabel'),
+    modalTitle: document.getElementById('modalLabel'),
     modalDescription: document.getElementById('modalBody'),
     readCompletelyButton: document.getElementById('readCompletelyButton'),
   };
