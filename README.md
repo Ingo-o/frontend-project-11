@@ -9,7 +9,9 @@ Hello! My name is Dmitry Epikhin and this is my third _frontend_ project on [Hex
 
 This service allows you to add an unlimited number of **_RSS_** feeds, updates them automatically and adds new posts to the general newsline. You can track and read a variety of sources (blogs for example) with it.
 
-➡️ You can check it [HERE](https://frontend-project-11-five.vercel.app/). Enjoy! 🙂
+➡️ [You can check it here.](https://frontend-project-11-five.vercel.app/)
+
+Enjoy! 🤓
 
 ## Used technologies:
 ```
