@@ -1,7 +1,10 @@
 export default {
   translation: {
-    success: 'RSS is uploaded successfully',
     viewBtn: 'View',
+    feedsBtn: 'Feeds',
+    postsBtn: 'Posts',
+
+    success: 'RSS is uploaded successfully',
 
     blankField: 'Field must not be empty',
     invalidUrl: 'invalid URL',

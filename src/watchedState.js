@@ -40,7 +40,7 @@ const handleLoadingProcess = (state, elements, i18n) => {
   }
 };
 
-const handleFeeds = (state, elements) => {
+const handleFeeds = (state, elements, i18n) => {
   elements.feedsDisplay.innerHTML = '';
 
   const feedsCard = document.createElement('div');
@@ -50,7 +50,7 @@ const handleFeeds = (state, elements) => {
   feedsTitleContainer.classList.add('card-body');
   const feedsTitle = document.createElement('h2');
   feedsTitle.classList.add('card-title', 'h4');
-  feedsTitle.textContent = 'Фиды';
+  feedsTitle.textContent = i18n.t('feedsBtn');
   feedsTitleContainer.append(feedsTitle);
 
   const feedsList = document.createElement('ul');
@@ -86,7 +86,7 @@ const handlePosts = (state, elements, i18n) => {
   postsTitleContainer.classList.add('card-body');
   const postsTitle = document.createElement('h2');
   postsTitle.classList.add('card-title', 'h4');
-  postsTitle.textContent = 'Посты';
+  postsTitle.textContent = i18n.t('postsBtn');
   postsTitleContainer.append(postsTitle);
 
   const postsList = document.createElement('ul');
