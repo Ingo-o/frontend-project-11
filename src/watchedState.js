@@ -138,7 +138,7 @@ export default (state, elements, i18n) => {
   const watchedState = onChange(state, (path) => {
     switch (path) {
       case 'form': return handleForm(state, elements, i18n);
-      case 'feeds': return handleFeeds(state, elements);
+      case 'feeds': return handleFeeds(state, elements, i18n);
       case 'posts': return handlePosts(state, elements, i18n);
       case 'viewedPosts': return handlePosts(state, elements, i18n);
       case 'loadingProcess': return handleLoadingProcess(state, elements, i18n);
