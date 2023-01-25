@@ -5,7 +5,7 @@ const handleForm = (state, elements, i18n) => {
   if (state.form.error) {
     elements.feedback.classList.remove('text-success');
     elements.feedback.classList.add('text-danger');
-    elements.feedback.innerText = i18n.t(state.form.error);
+    elements.feedback.textContent = i18n.t(state.form.error);
   }
 
   if (state.form.isValid) {
@@ -19,14 +19,14 @@ const handleLoadingProcess = (state, elements, i18n) => {
   if (state.loadingProcess.error) {
     elements.feedback.classList.remove('text-success');
     elements.feedback.classList.add('text-danger');
-    elements.feedback.innerText = i18n.t(state.loadingProcess.error);
+    elements.feedback.textContent = i18n.t(state.loadingProcess.error);
   }
 
   if (state.loadingProcess.status === 'idle') {
     elements.inputField.value = '';
     elements.feedback.classList.remove('text-danger');
     elements.feedback.classList.add('text-success');
-    elements.feedback.innerText = i18n.t('success');
+    elements.feedback.textContent = i18n.t('success');
     elements.inputField.classList.remove('is-invalid');
     elements.inputField.disabled = false;
     elements.submitButton.disabled = false;
@@ -129,8 +129,8 @@ const handlePosts = (state, elements, i18n) => {
 const handleModalWindow = (state, elements) => {
   const requiredPost = state.posts.find((post) => post.postID === state.modalWindow);
   elements.readCompletelyButton.setAttribute('href', requiredPost.link);
-  elements.modalTitle.innerText = requiredPost.title;
-  elements.modalDescription.innerText = requiredPost.description;
+  elements.modalTitle.textContent = requiredPost.title;
+  elements.modalDescription.textContent = requiredPost.description;
 };
 
 export default (state, elements, i18n) => {

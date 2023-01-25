@@ -76,8 +76,8 @@ export default () => {
     const postsRecheck = () => {
       const promises = state.feeds.map((feed) => axios
         .get(constructUrl(feed.link))
-        .then((response) => parseRSS(response))
-        .then((parsingResult) => {
+        .then((response) => {
+          const parsingResult = parseRSS(response);
           const { posts } = parsingResult;
           const newPosts = lodash
             .differenceWith(posts, state.posts, (p1, p2) => p1.title === p2.title)
@@ -106,13 +106,11 @@ export default () => {
       validateUrl(url, alreadyAddedLinks)
         .then(() => {
           watchedState.form = { isValid: true, error: null };
-        })
-        .then(() => {
           watchedState.loadingProcess = { status: 'loading' };
           return axios.get(constructUrl(url));
         })
-        .then((response) => parseRSS(response))
-        .then((parsingResult) => {
+        .then((response) => {
+          const parsingResult = parseRSS(response);
           const { feed, posts } = parsingResult;
           feed.feedID = url;
           feed.link = url;
