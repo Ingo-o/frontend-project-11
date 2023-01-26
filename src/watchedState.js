@@ -134,15 +134,26 @@ const handleModalWindow = (state, elements) => {
 };
 
 export default (state, elements, i18n) => {
-  // eslint-disable-next-line consistent-return
   const watchedState = onChange(state, (path) => {
     switch (path) {
-      case 'form': return handleForm(state, elements, i18n);
-      case 'feeds': return handleFeeds(state, elements, i18n);
-      case 'posts': return handlePosts(state, elements, i18n);
-      case 'viewedPosts': return handlePosts(state, elements, i18n);
-      case 'loadingProcess': return handleLoadingProcess(state, elements, i18n);
-      case 'modalWindow': return handleModalWindow(state, elements);
+      case 'form':
+        handleForm(state, elements, i18n);
+        break;
+      case 'feeds':
+        handleFeeds(state, elements, i18n);
+        break;
+      case 'posts':
+        handlePosts(state, elements, i18n);
+        break;
+      case 'viewedPosts':
+        handlePosts(state, elements, i18n);
+        break;
+      case 'loadingProcess':
+        handleLoadingProcess(state, elements, i18n);
+        break;
+      case 'modalWindow':
+        handleModalWindow(state, elements);
+        break;
       default:
         break;
     }
