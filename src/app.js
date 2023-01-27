@@ -5,12 +5,28 @@ import axios from 'axios';
 import lodash from 'lodash';
 import 'bootstrap';
 import ru from './locales/ru';
-import state from './state';
 import parseRSS from './parser';
 import watch from './watchedState';
 
 export default () => {
   const i18n = i18next.createInstance();
+
+  const state = {
+    feeds: [],
+    posts: [],
+    viewedPosts: new Set(),
+    modalWindow: null,
+
+    form: {
+      isValid: null,
+      error: null,
+    },
+
+    loadingProcess: {
+      status: 'idle',
+      error: null,
+    },
+  };
 
   const elements = {
     form: document.getElementById('form'),
